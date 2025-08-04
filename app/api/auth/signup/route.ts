@@ -63,12 +63,13 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     )
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('회원가입 오류:', error)
     
     // MongoDB 유효성 검사 오류 처리
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map((err: any) => err.message)
+    if (error instanceof Error && error.name === 'ValidationError') {
+      const validationError = error as unknown as { errors: Record<string, { message: string }> }
+      const messages = Object.values(validationError.errors).map((err) => err.message)
       return NextResponse.json(
         { message: messages.join(', ') },
         { status: 400 }
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 중복 키 오류 처리 (이메일 중복)
-    if (error.code === 11000) {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 11000) {
       return NextResponse.json(
         { message: '이미 존재하는 이메일입니다.' },
         { status: 409 }

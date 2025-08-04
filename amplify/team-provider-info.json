@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-paperbank-dev-7a0f5-authRole",
+      "UnauthRoleArn": "arn:aws:iam::448049810660:role/amplify-paperbank-dev-7a0f5-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::448049810660:role/amplify-paperbank-dev-7a0f5-authRole",
+      "Region": "ap-northeast-2",
+      "DeploymentBucketName": "amplify-paperbank-dev-7a0f5-deployment",
+      "UnauthRoleName": "amplify-paperbank-dev-7a0f5-unauthRole",
+      "StackName": "amplify-paperbank-dev-7a0f5",
+      "StackId": "arn:aws:cloudformation:ap-northeast-2:448049810660:stack/amplify-paperbank-dev-7a0f5/1cf7f660-7145-11f0-8b1e-02d5daa3c0c1",
+      "AmplifyAppId": "dqv4g0y1drdsj"
+    },
+    "categories": {
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "dqv4g0y1drdsj",
+          "type": "manual"
+        }
+      }
+    }
+  }
+}
