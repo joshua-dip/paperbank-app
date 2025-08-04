@@ -1,102 +1,161 @@
-import Image from "next/image";
+'use client'
+
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [user, setUser] = useState<{ email?: string; name?: string } | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    // 로그인 상태 확인 (실제로는 토큰이나 세션을 확인해야 함)
+    try {
+      const userData = localStorage.getItem('user')
+      if (userData) {
+        const parsedUser = JSON.parse(userData)
+        setUser(parsedUser)
+        setIsLoggedIn(true)
+      }
+    } catch (error) {
+      console.error('사용자 데이터 로딩 오류:', error)
+      localStorage.removeItem('user')
+    }
+    setIsLoading(false)
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('user')
+    setUser(null)
+    setIsLoggedIn(false)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">로딩 중...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* 헤더 */}
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center">
+              <h1 className="text-2xl font-bold text-gray-900">PaperBank</h1>
+            </div>
+            <nav className="flex items-center space-x-4">
+              {isLoggedIn ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-gray-700">
+                    안녕하세요, {user?.name || user?.email}님!
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+                  >
+                    로그아웃
+                  </button>
+                </div>
+              ) : (
+                <div className="flex space-x-2">
+                  <Link
+                    href="/login"
+                    className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
+                  >
+                    로그인
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="border border-indigo-600 text-indigo-600 px-4 py-2 rounded hover:bg-indigo-50 transition"
+                  >
+                    회원가입
+                  </Link>
+                </div>
+              )}
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      {/* 메인 컨텐츠 */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            PaperBank에 오신 것을 환영합니다
+          </h2>
+          <p className="text-xl text-gray-600 mb-8">
+            논문과 연구 자료를 효율적으로 관리하고 공유하세요
+          </p>
+
+          {isLoggedIn ? (
+            <div className="bg-white rounded-lg shadow p-8 max-w-2xl mx-auto">
+              <h3 className="text-2xl font-semibold text-gray-900 mb-6">
+                대시보드
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-blue-50 p-6 rounded-lg">
+                  <h4 className="text-lg font-medium text-blue-900 mb-2">내 논문</h4>
+                  <p className="text-3xl font-bold text-blue-600">0</p>
+                  <p className="text-sm text-blue-700">저장된 논문</p>
+                </div>
+                <div className="bg-green-50 p-6 rounded-lg">
+                  <h4 className="text-lg font-medium text-green-900 mb-2">즐겨찾기</h4>
+                  <p className="text-3xl font-bold text-green-600">0</p>
+                  <p className="text-sm text-green-700">즐겨찾는 논문</p>
+                </div>
+                <div className="bg-purple-50 p-6 rounded-lg">
+                  <h4 className="text-lg font-medium text-purple-900 mb-2">최근 조회</h4>
+                  <p className="text-3xl font-bold text-purple-600">0</p>
+                  <p className="text-sm text-purple-700">최근 본 논문</p>
+                </div>
+              </div>
+              <div className="mt-8">
+                <button className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition">
+                  새 논문 추가
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg shadow p-8 max-w-2xl mx-auto">
+              <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+                시작하려면 로그인하세요
+              </h3>
+              <p className="text-gray-600 mb-6">
+                계정을 만들고 논문 관리를 시작해보세요. 무료로 시작할 수 있습니다.
+              </p>
+              <div className="flex justify-center space-x-4">
+                <Link
+                  href="/signup"
+                  className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition"
+                >
+                  무료로 시작하기
+                </Link>
+                <Link
+                  href="/login"
+                  className="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition"
+                >
+                  기존 계정으로 로그인
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      {/* 푸터 */}
+      <footer className="bg-white border-t mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center text-gray-600">
+            <p>&copy; 2024 PaperBank. All rights reserved.</p>
+          </div>
+        </div>
       </footer>
     </div>
   );
